@@ -31,3 +31,86 @@ class CustomerDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomerDetails
         fields = ('phone', 'name', 'email', 'device_id')
+
+
+class AddFoodCategorySerializer(serializers.Serializer):
+
+    category_name = serializers.CharField(max_length=140, min_length=1, required=True)
+
+
+class UpdateFoodToOrderSerializer(serializers.Serializer):
+
+    order_id = serializers.CharField(max_length=140, min_length=1, required=True)
+    food_id = serializers.CharField(max_length=140, min_length=1, required=True)
+    food_qty = serializers.CharField(max_length=140, min_length=1, required=True)
+
+
+class RemoveFoodToOrderSerializer(serializers.Serializer):
+
+    order_id = serializers.CharField(max_length=140, min_length=1, required=True)
+    food_id = serializers.CharField(max_length=140, min_length=1, required=True)
+
+
+class DeleteOrderSerializer(serializers.Serializer):
+
+    order_id = serializers.CharField(max_length=140, min_length=1, required=True)
+    food_id = serializers.CharField(max_length=140, min_length=1, required=True)
+    food_qty = serializers.CharField(max_length=140, min_length=1, required=True)
+
+
+class CustomerDetailsSerializer(serializers.Serializer):
+
+    phone = serializers.CharField(max_length=140, min_length=1, required=True)
+    name = serializers.CharField(max_length=140, min_length=1, required=True)
+    email = serializers.CharField(max_length=140, min_length=1, required=True)
+
+
+class CreateOrderIdSerializer(serializers.Serializer):
+
+    cust_id = serializers.CharField(max_length=140, min_length=1, required=True)
+
+
+class OrderIdSerializer(serializers.Serializer):
+
+    order_id = serializers.CharField(max_length=140, min_length=1, required=True)
+
+
+class CheckoutSerializer(serializers.Serializer):
+
+    order_id = serializers.CharField(max_length=140, min_length=1, required=True)
+
+
+class ViewSalesTodaySerializer(serializers.Serializer):
+
+    order_status = serializers.CharField(max_length=140, min_length=1, required=True)
+
+
+class AddFoodDetailsSerializer(serializers.Serializer):
+
+    category_id = serializers.CharField(max_length=140, min_length=1, required=True)
+    name = serializers.CharField(max_length=140, min_length=1, required=True)
+    customer_price = serializers.CharField(max_length=1064140, min_length=1, required=True)
+    dealer_price = serializers.CharField(max_length=1064140, min_length=1, required=True)
+    offer_price = serializers.CharField(max_length=1064140, min_length=1, required=True)
+    description = serializers.CharField(max_length=140, min_length=1, required=True)
+    image = serializers.CharField(max_length=1000, min_length=1, required=True)
+    gross_weight = serializers.CharField(max_length=5, min_length=1, required=True)
+    net_weight = serializers.CharField(max_length=5, min_length=1, required=True)
+
+
+class AddDeliveryPersonSerializer(serializers.Serializer):
+
+    delivery_person_name = serializers.CharField(max_length=140, min_length=1, required=True)
+    delivery_person_phone = serializers.CharField(max_length=140, min_length=1, required=True)
+
+
+class AssignDeliverPersonToDeliverOrderSerializer(serializers.Serializer):
+
+    order_id = serializers.CharField(max_length=140, min_length=1, required=True)
+    delivery_person_id = serializers.CharField(max_length=140, min_length=1, required=True)
+
+
+class UpdateOrderSerializer(serializers.Serializer):
+
+    order_id = serializers.CharField(max_length=140, min_length=1, required=True)
+    order_status = serializers.CharField(max_length=140, min_length=1, required=True)

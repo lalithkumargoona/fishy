@@ -90,10 +90,11 @@ WSGI_APPLICATION = 'foodorderingsystem.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'fish',
-        'PASSWORD': 'saikiran65',
-        'HOST': 'database-fish.cr93vflj9z24.ap-south-1.rds.amazonaws.com',
+        'NAME': 'meatit',
+        'USER': 'meatit',
+        'PASSWORD': 'mettu65!',
+        'HOST': 'meatit.c09zcyly26fc.ap-south-1.rds.amazonaws.com',
+        #  'HOST': 'meatit.c09zcyly26fc.ap-south-1.rds.amazonaws.com',
         'PORT': '5432',
     }
 }

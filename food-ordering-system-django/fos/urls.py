@@ -1,31 +1,28 @@
 from django.urls import path
+from django.conf.urls import url
 
 from . import views
 
 
 urlpatterns = [
     path("", views.index),
-    path("employees/add-food-category", views.add_food_category, name="food_category"),
-    path("employees/add-food-details", views.add_food_details, name="food_details"),
-    path("employees/add-delivery-person", views.add_delivery_person, name="delivery_person"),
-    path("employees/assign-deliver-person-to-deliver-order", views.assign_deliver_person_to_deliver_order, name="assign_order"),
-    path("employees/update-order", views.update_order, name="update_order"),
-    path("employees/view-sales-today", views.view_sales_today, name="sales_today"),
-    path("employees/sum-revenue-today", views.sum_revenue_today, name="revenue_today"),
-    path("employees/delete-order", views.delete_order, name="delete_order"),
-    path("employees/<int:cust_id>/view-order", views.view_order_by_id, name="view_order"),
-    path("employees/<int:cust_id>/view-order-status", views.view_order_status_by_id, name="view_order_status"),
-    path("employees/<int:cust_id>/view-order-total", views.view_order_total_by_id, name="view_order_total"),
-    path("customers/view-menu", views.view_menu, name="menu"),
-    path("customers/signup", views.CustomerSignup.as_view(), name="signup"),
-    path("customers/<int:cust_id>/login", views.customer_login, name="login"),
-    path("customers/<int:cust_id>/create-order", views.create_order_id, name="order_id"),
-    path("customers/<int:cust_id>/add-food-to-order", views.add_food_to_order, name="add_food"),
-    path("customers/<int:cust_id>/remove-food-to-order", views.remove_food_to_order, name="remove_food"),
-    path("customers/<int:cust_id>/update-food-to-order", views.update_food_to_order, name="update_food"),
-    path("customers/<int:cust_id>/checkout", views.checkout, name="checkout"),
-    path("customers/<int:cust_id>/cancel-order", views.cancel_order, name="cancel_order"),
-    path("customers/<int:cust_id>/view-order", views.view_order_by_id, name="view_order"),
-    path("customers/<int:cust_id>/view-order-status", views.view_order_status_by_id, name="view_order_status"),
-    path("customers/<int:cust_id>/view-order-total", views.view_order_total_by_id, name="view_order_total")
+    url(r'^employees/add-food-category/$', views.AddFoodCategory.as_view(), name="food_category"),  # ok
+    url(r'^employees/add-food-details/$', views.AddFoodDetails.as_view(), name="food_details"),  # ok
+    url(r'^employees/add-delivery-person/$', views.AddDeliveryPerson.as_view(), name="delivery_person"),  # ok
+    url(r'^employees/assign-deliver-person-to-deliver-order/$', views.AssignDeliverPersonToDeliverOrder.as_view(), name="assign_order"),  # ok
+    url(r'^employees/update-order/$', views.UpdateOrder.as_view(), name="update_order"),  # ok
+    url(r'^employees/delete-order/$', views.DeleteOrder.as_view(), name="delete_order"),  # ok
+    url(r'^customers/view-menu', views.ViewMenu.as_view(), name="menu"),  # ok
+    url(r'^add_user/$', views.UserList.as_view(), name='addUser'),  # ok
+    url(r'^login_user/$', views.UserLogin.as_view(), name='userLogin'),  # ok
+    url(r'^validate_OTP/$', views.Otp.as_view(), name='validate_OTP'),  # ok
+    url(r'^customers/create-order', views.CreateOrderId.as_view(), name="order_id"),  # ok
+    url(r'^customers/add-food-to-order', views.AddFoodToOrder.as_view(), name="add_food"),  # ok
+    url(r'^customers/remove-food-to-order', views.RemoveFoodToOrder.as_view(), name="remove_food"),  # ok
+    url(r'^customers/update-food-to-order', views.UpdateFoodToOrder.as_view(), name="update_food"),  # ok
+    url(r'^customers/checkout/$', views.Checkout.as_view(), name="checkout"),  # ok
+    url(r'^customers/cancel-order/$', views.CancelOrderById.as_view(), name="cancel_order"),  # ok
+    url(r'^view-order/$', views.ViewOrderById.as_view(), name="view_order"),  # Down ok
+    url(r'^view-order-status/$', views.ViewOrderStatusById.as_view(), name="view_order_status"),  # Down ok
+    url(r'^view-order-total/$', views.ViewOrderTotalById.as_view(), name="view_order_total")  # Down ok
 ]

@@ -21,8 +21,13 @@ class FoodDetails(models.Model):
 
     category_id = models.ForeignKey(FoodCategory, on_delete=models.CASCADE, related_name="category_id")
     food_name = models.CharField(max_length=64)
-    discription = models.CharField(max_length=1064)
-    price = models.IntegerField()
+    description = models.CharField(max_length=1064)
+    gross_weight = models.CharField(max_length=1064)
+    net_weight = models.CharField(max_length=1064)
+    customer_price = models.CharField(max_length=1064)
+    dealer_price = models.CharField(max_length=1064)
+    offer_price = models.CharField(max_length=1064)
+    image = models.CharField(max_length=254, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "Food Details"
@@ -41,43 +46,6 @@ class CustomerDetails(models.Model):
 
 class Employee:
     """ Restaurant's end operation """
-
-    def add_food_category(self, category_name):
-        """ Insert a new food category """
-
-        category_name = FoodCategory(category_name=category_name)
-        category_name.save()
-        return category_name
-
-    def add_food_details(self, category_id, food_name, price):
-        """ Insert new food details """
-
-        food_details = FoodDetails(
-            category_id_id=category_id, 
-            food_name=food_name, 
-            price=price
-            )
-        food_details.save()
-        return food_details
-
-    def add_delivery_person(self, delivery_person_name, delivery_person_phone):
-        """ Insert new delivery person """
-
-        details = DeliveryPerson(
-            delivery_person_name=delivery_person_name, 
-            delivery_person_phone=delivery_person_phone
-            )
-        details.save()
-        return details
-
-    def assign_deliver_person_to_deliver_order(self, order_id, delivery_person_id):
-        """ Update CustOrderStatus table to add deliver person to deliver order """
-
-        assign_order = CustOrderStatus.objects\
-            .select_related('delivery_person_id')\
-            .filter(id=order_id)\
-            .update(delivery_person_id_id=delivery_person_id)
-        return assign_order
 
     def view_sales_today(self, order_status):
         """ View revenue/sales of today """
@@ -120,10 +88,8 @@ class Employee:
     def delete_order(self, order_id):
         """ Delete order """
 
-        del_status =  CustOrderStatus.objects\
-            .filter(id=order_id).delete()
-        del_selection =  CustOrderSelection.objects\
-            .filter(order_id=order_id).delete()
+        del_status = CustOrderStatus.objects.filter(id=order_id).delete()
+        del_selection = CustOrderSelection.objects.filter(order_id=order_id).delete()
         return del_status, del_selection
 
 
@@ -133,8 +99,7 @@ class Customer:
     def view_menu(self):
         """ Customer can view menu """
 
-        menu = FoodDetails.objects\
-            .select_related('category_id').all()
+        menu = FoodDetails.objects.select_related('category_id').all()
         return menu
 
     def customer_signup(self, cust_name, cust_phone, cust_email):
@@ -164,70 +129,19 @@ class Customer:
     def add_food_to_order(self, order_id, food_id, food_qty): 
         """ Add food items """
 
-        add_food = CustOrderSelection(
-            order_id_id=order_id, 
-            food_id_id=food_id, 
-            food_qty=food_qty
-            )
+        add_food = CustOrderSelection(order_id_id=order_id, food_id_id=food_id, food_qty=food_qty)
         add_food.save()
         return add_food
-
-    def remove_food_to_order(self, order_id, food_id):
-        """ Remove food items """
-
-        remove_food = CustOrderSelection.objects\
-            .filter(order_id_id=order_id)\
-            .filter(food_id_id=food_id).delete()
-        return remove_food
-
-    def update_food_to_order(self, order_id, food_id, food_qty):
-        """ Update food items """
-
-        update_food = CustOrderSelection.objects\
-            .filter(order_id_id=order_id)\
-            .filter(food_id_id=food_id)\
-            .update(food_qty=food_qty)
-        return update_food
-
-    def checkout(self, order_id, order_status, order_address, checkout_time, estimated_time, bill_amount):
-        """ Customer can checkout/confirm order """
-
-        checkout_update = CustOrderStatus.objects\
-            .filter(id=order_id)\
-            .update(
-                order_status=order_status, 
-                order_address=order_address, 
-                checkout_time=checkout_time, 
-                estimated_time=estimated_time, 
-                bill_amount=bill_amount
-                )
-        return checkout_update
-
-    def cancel_order(self, order_id, order_status):
-        """ Cancel order """
-
-        update_order = CustOrderStatus.objects\
-            .filter(id=order_id)\
-            .update(order_status=order_status)
-        return update_order
 
 
 class DeliveryPerson(models.Model):
     """ Represents delivery person """
 
     delivery_person_name = models.CharField(max_length=64)
-    delivery_person_phone = models.IntegerField()
+    delivery_person_phone = models.CharField(max_length=64)
 
     class Meta:
         verbose_name_plural = "Delivery Person"
-
-    def update_order(self, order_id, order_status):
-        """ Delivery person can update the order """
-
-        update = CustOrderStatus.objects\
-            .filter(id=order_id)\
-            .update(order_status=order_status)
-        return update
 
 
 class CustOrderStatus(models.Model):
@@ -256,7 +170,7 @@ class CustOrderSelection(models.Model):
         verbose_name_plural = "Customer Order Selection"
 
 
-### Common functions used by both employees and customers
+# Common functions used by both employees and customers
 
 def get_grand_total(order_id):
     """ Employee/Customer can view the grand total of an order """
@@ -278,26 +192,20 @@ def get_grand_total(order_id):
 def view_order(order_id):
     """ Employee/Customer can view details of a particular order """
 
-    view = CustOrderSelection.objects\
-        .select_related('food_id__category_id')\
-        .filter(order_id_id=order_id)
+    view = CustOrderSelection.objects.select_related('food_id__category_id').filter(order_id_id=order_id)
     return view
 
 
 def view_order_status(order_id):
     """ Employee/Customer can view status of the order """
 
-    view = CustOrderStatus.objects\
-        .select_related('cust_id')\
-        .select_related('delivery_person_id')\
-        .filter(id=order_id)
+    view = CustOrderStatus.objects.select_related('cust_id').select_related('delivery_person_id').filter(id=order_id)
     return view
 
 
 def view_order_total(order_id):
     """ Employee/Customer can view the grand total of an order """
 
-    view = CustOrderStatus.objects\
-        .select_related('cust_id')\
-        .filter(id=order_id)
+    view = CustOrderStatus.objects.select_related('cust_id').filter(id=order_id)
     return view
+
