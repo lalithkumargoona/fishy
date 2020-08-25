@@ -3,18 +3,14 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-
 from django.conf import settings
-from datetime import datetime, timedelta
 from .serializers import *
 import requests
-
-from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 
-from .models import Employee, Customer, DeliveryPerson, get_grand_total, view_order, view_order_status, view_order_total
+from .models import Employee, Customer, DeliveryPerson, get_grand_total
 
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
@@ -38,7 +34,7 @@ def request_method(request):
         return json_data
 
 
-### Employee's func and routes
+# Employee's func and routes
 
 
 class AddFoodCategory(APIView):  # {"category_name":"test"}
@@ -47,6 +43,9 @@ class AddFoodCategory(APIView):  # {"category_name":"test"}
 
     # noinspection PyMethodMayBeStatic
     def post(self, request):
+        email_data_length = str(request.headers) + str(request) + str(request.data)
+        print(str(email_data_length))
+        print(str(request.data))
         serializer = AddFoodCategorySerializer(data=request.data)
         if not serializer.is_valid():
             data = {"INFO": serializer.errors}
@@ -190,10 +189,10 @@ class ViewMenu(APIView):
                 "category_name": m.category_id.category_name,
                 "food_id": m.id,
                 "food_name": m.food_name,
-                "price": m.price
+                "price": m.offer_price
                 }
             result.append(dict_obj)
-        return JsonResponse(menu, status=status.HTTP_200_OK)
+        return JsonResponse(result, status=status.HTTP_200_OK, safe=False)
 
 
 class CustomerSignup(APIView):  # {"cust_name":"test", "cust_phone":111, "cust_email":"test"}
@@ -496,6 +495,7 @@ class ViewOrderById(APIView):
             return JsonResponse(data, status=status.HTTP_400_BAD_REQUEST)
         else:
             order_id = serializer.data["order_id"]
+            result = []
             view_order = CustOrderSelection.objects.select_related('food_id__category_id').filter(order_id_id=order_id)
             for i in view_order:
                 dict_obj = {
@@ -505,7 +505,8 @@ class ViewOrderById(APIView):
                     "total_bill": i.bill_amount,
                     "delivery_person_name": i.delivery_person_id.delivery_person_name
                     }
-            return JsonResponse(dict_obj, status=status.HTTP_200_OK)
+                result.append(dict_obj)
+            return JsonResponse(result, status=status.HTTP_200_OK)
 
 
 class ViewOrderStatusById(APIView):
@@ -520,6 +521,7 @@ class ViewOrderStatusById(APIView):
             return JsonResponse(data, status=status.HTTP_400_BAD_REQUEST)
         else:
             order_id = serializer.data["order_id"]
+            result = []
             view_order = CustOrderStatus.objects.select_related('cust_id').select_related('delivery_person_id').filter(id=order_id)
             for i in view_order:
                 dict_obj = {
@@ -529,7 +531,8 @@ class ViewOrderStatusById(APIView):
                     "total_bill": i.bill_amount,
                     "delivery_person_name": i.delivery_person_id.delivery_person_name
                     }
-            return JsonResponse(dict_obj, status=status.HTTP_200_OK)
+                result.append(dict_obj)
+            return JsonResponse(result, status=status.HTTP_200_OK)
 
 
 class ViewOrderTotalById(APIView):
@@ -544,6 +547,7 @@ class ViewOrderTotalById(APIView):
             return JsonResponse(data, status=status.HTTP_400_BAD_REQUEST)
         else:
             order_id = serializer.data["order_id"]
+            result = []
             view_order = CustOrderStatus.objects.select_related('cust_id').filter(id=order_id)
             for i in view_order:
                 dict_obj = {
@@ -551,5 +555,6 @@ class ViewOrderTotalById(APIView):
                     "order_id": i.id,
                     "grand_total": i.bill_amount
                     }
-            return JsonResponse(dict_obj, status=status.HTTP_200_OK)
+                result.append(dict_obj)
+            return JsonResponse(result, status=status.HTTP_200_OK)
 
