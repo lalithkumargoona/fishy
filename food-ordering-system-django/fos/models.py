@@ -39,9 +39,20 @@ class CustomerDetails(models.Model):
     cust_name = models.CharField(max_length=64)
     cust_phone = models.CharField(unique=True, max_length=14)
     cust_email = models.CharField(max_length=64)
+    cust_device_id = models.CharField(max_length=64, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "Customer Details"
+
+
+class CustomerAddress(models.Model):
+    """ Represents customer details """
+
+    cust_address = models.CharField(max_length=264)
+    cust_phone = models.CharField(unique=True, max_length=14)
+
+    class Meta:
+        verbose_name_plural = "Customer Address"
 
 
 class Employee:
@@ -154,6 +165,7 @@ class CustOrderStatus(models.Model):
     order_status = models.CharField(max_length=64, null=True, blank=True)
     order_address = models.CharField(max_length=64, null=True, blank=True)
     bill_amount = models.IntegerField(null=True, blank=True)
+    cust_review = models.CharField(max_length=64, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "Customer Order Status"

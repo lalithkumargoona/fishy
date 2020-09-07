@@ -23,14 +23,14 @@ class OtpSerializer(serializers.Serializer):
 
 class CustomerDataSerializer(serializers.ModelSerializer):
 
-    cust_phone = serializers.CharField(source='cust_phone')
-    cust_name = serializers.CharField(source='cust_name')
+    phone = serializers.CharField(source='cust_phone')
+    name = serializers.CharField(source='cust_name')
     email = serializers.EmailField(source='cust_email')
-    device_id = serializers.CharField(source='cust_deviceid')
+    # device_id = serializers.CharField(source='cust_deviceid')
 
     class Meta:
         model = CustomerDetails
-        fields = ('phone', 'name', 'email', 'device_id')
+        fields = ('phone', 'name', 'email')
 
 
 class AddFoodCategorySerializer(serializers.Serializer):

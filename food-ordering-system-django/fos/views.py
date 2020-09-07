@@ -117,6 +117,23 @@ class AssignDeliverPersonToDeliverOrder(APIView):  # {"category_name":"test"}
             return JsonResponse({"INFO": "Assigned"}, status=status.HTTP_200_OK)
 
 
+class DeliverPersonLocation(APIView):  # {"category_name":"test"}
+    permission_classes = [AllowAny]
+    authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
+
+    # noinspection PyMethodMayBeStatic
+    def put(self, request):
+        serializer = AssignDeliverPersonToDeliverOrderSerializer(data=request.data)
+        if not serializer.is_valid():
+            data = {"INFO": serializer.errors}
+            return JsonResponse(data, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            order_id = serializer.data["order_id"]
+            delivery_person_id = serializer.data["delivery_person_id"]
+            assign_order = CustOrderStatus.objects.select_related('delivery_person_id').filter(id=order_id).update(delivery_person_id_id=delivery_person_id)
+            return JsonResponse({"INFO": "Assigned"}, status=status.HTTP_200_OK)
+
+
 class UpdateOrder(APIView):  # {"category_name":"test"}
     permission_classes = [AllowAny]
     authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
@@ -153,26 +170,7 @@ class DeleteOrder(APIView):  # {"category_name":"test"}
             return JsonResponse(dict_obj)
 
 
-### Customer's func and routes
-
-@csrf_exempt
-def view_menu(request):
-    """
-    >> curl http://127.0.0.1:8000/customers/view-menu
-    """
-
-    result = []
-    menu = Customer.view_menu(request)
-    for m in menu:
-        dict_obj = {
-            "category_id": m.category_id.id,
-            "category_name": m.category_id.category_name,
-            "food_id": m.id,
-            "food_name": m.food_name,
-            "price": m.price
-            }
-        result.append(dict_obj)
-    return JsonResponse(result, safe=False)
+#  Customer's func and routes
 
 
 class ViewMenu(APIView):
@@ -183,6 +181,27 @@ class ViewMenu(APIView):
     def get(self, request):
         result = []
         menu = FoodDetails.objects.select_related('category_id').all()
+        for m in menu:
+            dict_obj = {
+                "category_id": m.category_id.id,
+                "category_name": m.category_id.category_name,
+                "food_id": m.id,
+                "food_name": m.food_name,
+                "price": m.offer_price
+                }
+            result.append(dict_obj)
+        return JsonResponse(result, status=status.HTTP_200_OK, safe=False)
+
+
+class ViewMenuById(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
+
+    # noinspection PyMethodMayBeStatic
+    def get(self, request, id):
+        result = []
+        menu = FoodDetails.objects.filter(category_id=id)
+        print(menu)
         for m in menu:
             dict_obj = {
                 "category_id": m.category_id.id,
@@ -231,17 +250,18 @@ class UserList(APIView):
     def post(self, request):
         serializer = CustomerDetailsSerializer(data=request.data)
         if serializer.is_valid():
-            user = CustomerDetails.objects.filter(cust_phone=serializer.data['cust_phone'])
+            user = CustomerDetails.objects.filter(cust_phone=serializer.data['phone'])
             if user.exists():
                 return JsonResponse({"INFO": "number already exists"})
-            parent_rec = CustomerDetails(cust_phone=serializer.data['cust_phone'])
+            parent_rec = CustomerDetails(cust_phone=serializer.data['phone'])
             if 'name' in serializer.data:
-                parent_rec.cust_name = serializer.data['cust_name']
+                parent_rec.cust_name = serializer.data['name']
             if 'email' in serializer.data:
-                parent_rec.cust_email = serializer.data['cust_email']
+                parent_rec.cust_email = serializer.data['email']
             parent_rec.save()
             parent_rec_serialised = CustomerDataSerializer(parent_rec, context={'request': request})
             otp_sent = False
+            print("1")
             try:
                 api = "http://control.msg91.com/api/sendotp.php"
                 data = {'authkey': '241566AzbypoaVSBZB5bb9ec50', 'message': 'Your One Time Password for GThink Inventors Registration is ##OTP##.', 'sender': 'GTHINK', 'mobile': serializer.data['phone']}
@@ -250,10 +270,12 @@ class UserList(APIView):
                     data['email'] = serializer.data['email']
                 r = requests.post(url=api, data=data)
                 resp = json.loads(r.text)
+                print("2")
                 if r.status_code == 200 and resp["type"] == 'success':
                     otp_sent = True
             except ImportError:
                 otp_sent = False
+            print(serializer.data['phone'])
             return JsonResponse({"INFO": "User created successfully", "user_info": {"id": parent_rec_serialised.data['phone'], "phone": parent_rec_serialised.data['phone']}, "OTP_Sent": otp_sent}, status=status.HTTP_201_CREATED)
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
